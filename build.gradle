@@ -1,14 +1,22 @@
 apply plugin: 'groovy'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.7
 group = 'com.layer'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 apply from: "$rootDir/version.gradle"
 
 repositories {
     mavenCentral()
     jcenter()
 }
+
+javadoc {
+    options.charSet = 'UTF-8'
+    options.encoding = 'UTF-8'
+}
+
 
 dependencies {
     compile gradleApi()
@@ -28,4 +36,27 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives javadocJar, sourcesJar
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file:${projectDir}/releases")
+        }
+    }
+}
+
+[install.repositories.mavenInstaller, uploadArchives.repositories.mavenDeployer]*.pom*.whenConfigured { pom ->
+    pom.project {
+        name 'Gradle Git Repo Plugin'
+        packaging 'jar'
+        description 'Use a git repo as a maven-style repo'
+        url 'https://github.com/layerhq/gradle-git-repo-plugin'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+        }
+    }
 }
